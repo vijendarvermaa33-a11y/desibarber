@@ -97,10 +97,14 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      # IMPORTANT:
+      # Do not let setup-android install the obsolete "tools" package.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ""
 
-      - name: Install Android SDK
+      - name: Install Android SDK Packages
         shell: bash
         run: |
           yes | sdkmanager --licenses >/dev/null || true
@@ -109,6 +113,20 @@ jobs:
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
+
+      - name: Check Android SDK
+        shell: bash
+        run: |
+          echo "Android SDK:"
+          echo "$ANDROID_SDK_ROOT"
+
+          echo ""
+          echo "SDK Manager:"
+          sdkmanager --version
+
+          echo ""
+          echo "Installed packages:"
+          sdkmanager --list_installed | head -100
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
